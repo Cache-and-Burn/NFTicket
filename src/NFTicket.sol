@@ -9,25 +9,43 @@ contract TicketNFT is ERC721 {
   // Define the ticket price
   uint256 public ticketPrice;
 
+  // Define total supply
+  uint256 public totalSupply;
+
   // Define the array of ticket holders
   mapping(uint256 => address) public ticketHolders;
+
+  // Define NFT uri
+  string public uri;
 
   // Redeemed tickets
   mapping(uint256 => bool) public redeemed;
 
-  // The contract constructor
-  constructor() public {
-    // Set the contract owner to the address that deployed the contract
+  // Define ticketId
+  uint256 public ticketId;
+
+  // TODO create events
+
+  constructor(uint256 _ticketPrice, uint256 _totalSupply, string memory _name, string memory _symbol, string memory _uri) public {
+    
     owner = msg.sender;
+    ticketPrice = _ticketPrice;
+    totalSupply = _totalSupply;
+    name = _name;
+    symbol = _symbol;
+    uri = _uri;
   }
+  
+  //////PUBLIC FUNCTIONS////// 
 
   // A function for purchasing a ticket
   function purchaseTicket() public payable {
-    // Check if the caller has enough funds
+    // Checks
     require(msg.value >= ticketPrice, "Insufficient funds");
+    require(ticketId <= totalSupply);
 
     // Create a new NFT token and assign it to the caller
-    uint256 ticketId = _totalSupply() + 1;
+    ticketId = totalSupply() + 1;
     _mint(msg.sender, ticketId);
 
     // Add the caller to the array of ticket holders
@@ -65,6 +83,14 @@ contract TicketNFT is ERC721 {
 
     // Add to list of redeemed tickets
     redeemed[ticketId] = true;
+  }
+
+  //////ADMIN FUNCTIONS//////
+
+  // A function to adjust ticket price
+  function setTicketPrice(uint256 _price) public {
+    require(msg.sender == owner);
+    ticketPrice = _price;
   }
   
 }
